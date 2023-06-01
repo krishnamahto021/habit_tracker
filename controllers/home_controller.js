@@ -1,5 +1,5 @@
 module.exports.entryPage = function(req,res){
-    return res.render('home',{
+    return res.render('entry_page',{
         title:'home'
     })
 }

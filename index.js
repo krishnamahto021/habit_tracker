@@ -6,6 +6,8 @@ const port = 8000;
 // to use ejs layouts
 // app.use(layout);
 
+app.use(express.static('./assets'));
+
 // to set view engine
 app.set('view engine','ejs'); 
 app.set('views','./views');
