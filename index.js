@@ -3,6 +3,9 @@ const app = express();
 const port = 8000;
 // const layout = require('express-ejs-layouts');
 
+// require database
+const db = require('./config/mogoose');
+
 // to use ejs layouts
 // app.use(layout);
 
