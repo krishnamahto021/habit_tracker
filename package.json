@@ -1,0 +1,22 @@
+{
+  "name": "habit_tracker",
+  "version": "1.0.0",
+  "description": "This is habit tracker web app helping user to track their habits",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx nodemon index.js"
+  },
+  "keywords": [
+    "Habit",
+    "Tracker",
+    "MongoDb"
+  ],
+  "author": "Krishna",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-ejs-layouts": "^2.5.1"
+  }
+}
