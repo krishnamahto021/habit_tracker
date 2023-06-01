@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/user_sign_up.css">
+    <title><%=title%></title>
+</head>
+<body>
+    <div id="view-form">
+    <form action="/users/create" method="post" id="sign-up-form">
+        <input type="text" name="name" placeholder="Enter your name" required>
+        <input type="email" name="email" placeholder="Enter your email" required>
+        <input type="password" name="password" placeholder="Enter your password" required>
+        <input type="password" name="confirm_password" placeholder="Re-enter your password" required>
+        <button type="submit" id="create-account">Create Account</button>
+    </form>
+    <a href="/users/google/auth" id="create-account-google">Sign Up or Sign In using Google</a>
+    </div>
+    
+</body>
+</html>
