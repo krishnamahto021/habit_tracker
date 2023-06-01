@@ -9,12 +9,14 @@ module.exports.signUp = function(req,res){
 module.exports.create = async function(req,res){
     try{
     if(req.body.password != req.body.confirm_password){
-        console.log('Password not matched!!');
+        // console.log('Password not matched!!');
+        req.flash('error','Password not matched!');
         return res.redirect('back');
     }
     else {
         const user = await User.findOne({email:req.body.email});
         if(user){
+            req.flash('error','email already registered!');
             return res.redirect('/');
         }else{
         const newUser = await User.create({
@@ -22,17 +24,17 @@ module.exports.create = async function(req,res){
                 email:req.body.email,
                 password:req.body.password
             });
+            req.flash('success','Account created Successfully!');
             return res.redirect('/');
         }
     }
 }catch(err){
-    console.log('error in creating user');
+    console.log('error in creating user',err);
 }
 }
 
 // to create seesion of the user
 module.exports.createSession = function(req,res){
-    console.log('user logged in!!');
     return res.redirect('/users/profile');
 }
 

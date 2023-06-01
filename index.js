@@ -4,7 +4,7 @@ const port = 8000;
 
 // require database
 const db = require('./config/mogoose');
-// const layout = require('express-ejs-layouts');
+const layout = require('express-ejs-layouts');
 const cookieParser = require('cookie-parser');
 
 // set up the express session and passport
@@ -13,16 +13,26 @@ const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const passportLocal = require('./config/passport-local-strategy');
 
+// to set up the google authentcaiton
+const googleStrategy = require('./config/passport-google-oauth-2-strategy');
+
+// set up the flash
+const connectFlash = require('connect-flash');
+const customMware = require('./config/middleware');
+
+
 
 
 // to use ejs layouts
-// app.use(layout);
+app.use(layout);
 
 // to use cookie-parser and urlencoded
 app.use(express.urlencoded());
 app.use(cookieParser());
 
 app.use(express.static('./assets'));
+app.set('layout extractStyles',true);
+app.set('layout extractScripts',true);
 
 // to set view engine
 app.set('view engine','ejs'); 
@@ -51,6 +61,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(passport.setAuthenticatedUser);
+
+// using connect flash to show notifications
+app.use(connectFlash());
+app.use(customMware.setFlash);
 
 // to use routes
 app.use('/',require('./routes'));

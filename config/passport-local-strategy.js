@@ -23,25 +23,27 @@ passport.deserializeUser(async function(id,done){
 passport.use(new LocalStrategy(
     {
     usernameField:'email',
-    // passReqToCallback:true
+    passReqToCallback:true
     },
-    async function(email,password,done){
+    async function(req,email,password,done){
         try{
             const user = await User.findOne({email:email});
-            console.log(user);
+            if(user){ // if user is present then only try to match password else not match
             const isMatch = await bcrypt.compare(password,user.password);
-            console.log(isMatch);
+            }
             if(!user){
-                console.log('Email not registered!');
+                // console.log('Email not registered!');
+                req.flash('error','Email not Registered!');
                 return done(null,false);
             }else if(!isMatch){
-                console.log('Invalid password!!');
+                req.flash('error','Invalid Password!');
                 return done(null,false);
             }
+            req.flash('success','Logged in Successfully!');
             return done(null,user);
 
         }catch(err){
-            console.log('error in passport local strategy establishing the user!');
+            console.log('error in passport local strategy establishing the user!',err);
         }
     }
 ));
