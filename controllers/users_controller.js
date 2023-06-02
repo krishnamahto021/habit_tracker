@@ -40,14 +40,15 @@ module.exports.create = async function (req, res) {
 
 // to create seesion of the user
 module.exports.createSession = function (req, res) {
-    req.flash('success', 'Logged in Successfully!')
+    req.flash('success', 'Logged in Successfully!');
     return res.redirect('/users/profile');
 }
 
 // to render profile page
 module.exports.userProfile = function (req, res) {
     return res.render('user_profile', {
-        title: 'User Profile'
+        title: 'User Profile',
+        showHeaderAndFooter:true
     });
 };
 
@@ -82,39 +83,50 @@ module.exports.forgottenPasswordEmailCollect = async function (req, res) {
 // render the update password form
 module.exports.resetPassword = async function (req, res) {
     try {
-        const user = await User.findOne({ token: req.params.token});
+        const user = await User.findOne({ token: req.params.token });
         if (user) {
             return res.render('reset_password', {
                 title: 'Reset Password',
-                user_id:user._id
+                user_id: user._id
             });
-        }else{
-            req.flash('error','Unauthorizzed Access');
+        } else {
+            req.flash('error', 'Unauthorizzed Access');
             return res.redirect('back');
         }
-} catch (err) {
+    } catch (err) {
         console.log('error in sending maile', err);
         return res.redirect('back');
     }
 }
 
 // to collect password from above form and finally update the password of user
-module.exports.updatePassword = async function(req,res){
-    try{
+module.exports.updatePassword = async function (req, res) {
+    try {
         const user = await User.findById(req.body.userId);
-        if(user){
+        if (user) {
             user.password = req.body.password;
             user.save();
-            req.flash('success','Password updated Successfully');
+            req.flash('success', 'Password updated Successfully');
             return res.redirect('/');
-        }else{
-            req.flash('error','Unauthorized Access');
+        } else {
+            req.flash('error', 'Unauthorized Access');
             return res.redirect('/');
         }
 
-    }catch(err){
-        console.log('error in updating password ',err);
-        req.flash('error','Internal Server Error!!');
+    } catch (err) {
+        console.log('error in updating password ', err);
+        req.flash('error', 'Internal Server Error!!');
         return res.redirect('/');
     }
+}
+
+// to sign out the user
+module.exports.destroySession = function (req, res) {
+    req.logout(function (err) {
+        if (err) {
+            req.flash('error', 'Something Went Wrong!!');
+        }
+        req.flash('success', 'Logged out successfully!!');
+        return res.redirect('/');
+    });
 }

@@ -25,6 +25,9 @@ router.get('/reset-password/:token',usersController.resetPassword);
 // to collect data from above form
 router.post('/reset-password',usersController.updatePassword);
 
+// to signout the user
+router.get('/sign-out',usersController.destroySession);
+
 
 
 module.exports = router;
