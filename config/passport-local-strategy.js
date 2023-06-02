@@ -28,8 +28,9 @@ passport.use(new LocalStrategy(
     async function(req,email,password,done){
         try{
             const user = await User.findOne({email:email});
+            let isMatch;
             if(user){ // if user is present then only try to match password else not match
-            const isMatch = await bcrypt.compare(password,user.password);
+            isMatch = await bcrypt.compare(password,user.password);
             }
             if(!user){
                 // console.log('Email not registered!');

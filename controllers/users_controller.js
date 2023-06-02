@@ -1,46 +1,120 @@
 const User = require('../models/users');
-module.exports.signUp = function(req,res){
-    return res.render('user_sign_up',{
-        title:'User SignUp'
+const userSignUpMailer = require('../mailers/user_sign_up_mailer');
+const forgottenPasswordMailer = require('../mailers/fogotten_password_mailer');
+const crypto = require('crypto');
+
+module.exports.signUp = function (req, res) {
+    return res.render('user_sign_up', {
+        title: 'User SignUp'
     })
 }
 
 // to fetch data from signUp form
-module.exports.create = async function(req,res){
-    try{
-    if(req.body.password != req.body.confirm_password){
-        // console.log('Password not matched!!');
-        req.flash('error','Password not matched!');
-        return res.redirect('back');
-    }
-    else {
-        const user = await User.findOne({email:req.body.email});
-        if(user){
-            req.flash('error','email already registered!');
-            return res.redirect('/');
-        }else{
-        const newUser = await User.create({
-                name:req.body.name,
-                email:req.body.email,
-                password:req.body.password
-            });
-            req.flash('success','Account created Successfully!');
-            return res.redirect('/');
+module.exports.create = async function (req, res) {
+    try {
+        if (req.body.password != req.body.confirm_password) {
+            // console.log('Password not matched!!');
+            req.flash('error', 'Password not matched!');
+            return res.redirect('back');
         }
+        else {
+            const user = await User.findOne({ email: req.body.email });
+            if (user) {
+                req.flash('error', 'email already registered!');
+                return res.redirect('/');
+            } else {
+                const newUser = await User.create({
+                    name: req.body.name,
+                    email: req.body.email,
+                    password: req.body.password
+                });
+                userSignUpMailer.signUp(newUser);
+                req.flash('success', 'Account created Successfully!');
+                return res.redirect('/');
+            }
+        }
+    } catch (err) {
+        console.log('error in creating user', err);
     }
-}catch(err){
-    console.log('error in creating user',err);
-}
 }
 
 // to create seesion of the user
-module.exports.createSession = function(req,res){
+module.exports.createSession = function (req, res) {
+    req.flash('success', 'Logged in Successfully!')
     return res.redirect('/users/profile');
 }
 
 // to render profile page
-module.exports.userProfile = function(req,res){
-    return res.render('user_profile',{
-        title:'User Profile'
+module.exports.userProfile = function (req, res) {
+    return res.render('user_profile', {
+        title: 'User Profile'
     });
 };
+
+// to show form for email filling of forgoteen password
+module.exports.forgottenPassword = function (req, res) {
+    return res.render('forgotten_password', {
+        title: 'Forgot Password!'
+    });
+};
+
+// to collect data from the above form
+module.exports.forgottenPasswordEmailCollect = async function (req, res) {
+    try {
+        const user = await User.findOne({ email: req.body.email });
+        if (user) {
+            const token = crypto.randomBytes(20).toString('hex');
+            user.token = token;
+            user.save();
+            forgottenPasswordMailer.forgottenPassword(user.email, token);
+            req.flash('success', 'Reset Email sent!');
+            return res.redirect('/');
+        } else {
+            req.flash('error', 'Email not registered!');
+            return res.redirect('/');
+        }
+
+    } catch (err) {
+        console.log('error in finding user while reseting password', err);
+    }
+}
+
+// render the update password form
+module.exports.resetPassword = async function (req, res) {
+    try {
+        const user = await User.findOne({ token: req.params.token});
+        if (user) {
+            return res.render('reset_password', {
+                title: 'Reset Password',
+                user_id:user._id
+            });
+        }else{
+            req.flash('error','Unauthorizzed Access');
+            return res.redirect('back');
+        }
+} catch (err) {
+        console.log('error in sending maile', err);
+        return res.redirect('back');
+    }
+}
+
+// to collect password from above form and finally update the password of user
+module.exports.updatePassword = async function(req,res){
+    try{
+        const user = await User.findById(req.body.userId);
+        if(user){
+            user.password = req.body.password;
+            user.save();
+            req.flash('success','Password updated Successfully');
+            return res.redirect('/');
+        }else{
+            req.flash('error','Unauthorized Access');
+            return res.redirect('/');
+        }
+
+    }catch(err){
+        console.log('error in updating password ',err);
+        req.flash('error','Internal Server Error!!');
+        return res.redirect('/');
+    }
+}

@@ -13,6 +13,18 @@ router.get('/auth/google/callback',passport.authenticate('google',{failureRedire
 
 router.get('/profile',usersController.userProfile);
 
+// to show form for forgotten password
+router.get('/forgotten-password',usersController.forgottenPassword);
+
+// to collect data from above form
+router.post('/forgotten-password',usersController.forgottenPasswordEmailCollect);
+
+// to show form for updating password
+router.get('/reset-password/:token',usersController.resetPassword);
+
+// to collect data from above form
+router.post('/reset-password',usersController.updatePassword);
+
 
 
 module.exports = router;
