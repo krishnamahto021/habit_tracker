@@ -4,6 +4,10 @@ const forgottenPasswordMailer = require('../mailers/fogotten_password_mailer');
 const crypto = require('crypto');
 
 module.exports.signUp = function (req, res) {
+    // if user is already signed in don't show the signin page rather show profile page
+    if (req.isAuthenticated()) {
+        return res.redirect('/users/profile');
+    }
     return res.render('user_sign_up', {
         title: 'User SignUp'
     })
@@ -48,7 +52,7 @@ module.exports.createSession = function (req, res) {
 module.exports.userProfile = function (req, res) {
     return res.render('user_profile', {
         title: 'User Profile',
-        showHeaderAndFooter:true
+        showHeaderAndFooter: true
     });
 };
 

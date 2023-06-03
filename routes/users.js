@@ -11,7 +11,7 @@ router.get('/create-session', passport.authenticate('local', { failureRedirect: 
 router.get('/auth/google',passport.authenticate('google',{scope:['email','profile']}));
 router.get('/auth/google/callback',passport.authenticate('google',{failureRedirect:'/'}),usersController.createSession);
 
-router.get('/profile',usersController.userProfile);
+router.get('/profile',passport.checkAuthentication,usersController.userProfile);
 
 // to show form for forgotten password
 router.get('/forgotten-password',usersController.forgottenPassword);

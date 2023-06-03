@@ -50,11 +50,11 @@ passport.use(new LocalStrategy(
 ));
 
 // check if the user is authenticated 
-passport.checkAuthenticaion = function(req,res,next){
+passport.checkAuthentication = function(req,res,next){
     if(req.isAuthenticated()){
         return next();
     }else{
-        return res.redired('/');
+        return res.redirect('/');
     }
 }
 
