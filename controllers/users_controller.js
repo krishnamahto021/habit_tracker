@@ -134,18 +134,33 @@ module.exports.trackHabit =  function(req,res){
     user.skincare  = req.body.skincare;
     user.save();
     req.flash('success','Habit for today Tracked Successfully!');
-    return res.redirect('/users/streak');
+    return res.redirect('/users/calendar');
 }
 
-// to show the streak
-module.exports.overallStreak = function(req,res){
+// to show calendar 
+module.exports.showCalendar = function(req,res){
+    return res.render('calendar',{
+        title:'Streak'
+    })
+};
+
+// to update the calendar
+module.exports.updateCalendar = function(req,res){
     const user = res.locals.user;
     if(user.diet === 'done' && user.walk === 'done' && user.podcast === 'done' && user.skincare === 'done' && user.book === 'done'){
-
+        const responseData = {
+            userId : req.user._id,
+            isStreak:true
+        }
+        return res.json(200,{
+            data:responseData,
+            message:'Updated Streak'
+        });
     }else{
-
+        return res.json(401,{
+            message:'Not Done!!'
+        })
     }
-    return res.redirect('/users/track-habit');
 }
 
 

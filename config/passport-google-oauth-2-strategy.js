@@ -23,7 +23,7 @@ passport.use(new googleStrategy({
             }
 
         }catch(err){
-            console.log('error in authentication using google');
+            console.log('error in authentication using google',err);
             return;
         }
 

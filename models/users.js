@@ -17,27 +17,23 @@ const userSchema = new mongoose.Schema({
     diet:{
         type:String,
         enum:['done' , 'not done' , 'none'],
-        required:true
     },
     walk:{
         type:String,
         enum:['done' , 'not done' , 'none'],
-        required:true
     },
     book:{
         type:String,
         enum:['done' , 'not done' , 'none'],
-        required:true
     },
     podcast:{
         type:String,
         enum:['done' , 'not done' , 'none'],
-        required:true
+
     },
     skincare:{
         type:String,
         enum:['done' , 'not done' , 'none'],
-        required:true
     },
     token:{
         type:String,
