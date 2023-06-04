@@ -124,6 +124,58 @@ module.exports.updatePassword = async function (req, res) {
     }
 }
 
+// to collect data from the user profile page of the user
+module.exports.trackHabit =  function(req,res){
+    const user= res.locals.user;
+    user.diet = req.body.diet;
+    user.book = req.body.book;
+    user.podcast = req.body.podcast;
+    user.walk = req.body.walk;
+    user.skincare  = req.body.skincare;
+    user.save();
+    req.flash('success','Habit for today Tracked Successfully!');
+    return res.redirect('/users/streak');
+}
+
+// to show the streak
+module.exports.overallStreak = function(req,res){
+    const user = res.locals.user;
+    if(user.diet === 'done' && user.walk === 'done' && user.podcast === 'done' && user.skincare === 'done' && user.book === 'done'){
+
+    }else{
+
+    }
+    return res.redirect('/users/track-habit');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // to sign out the user
 module.exports.destroySession = function (req, res) {
     req.logout(function (err) {

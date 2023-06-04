@@ -25,6 +25,10 @@ router.get('/reset-password/:token',usersController.resetPassword);
 // to collect data from above form
 router.post('/reset-password',usersController.updatePassword);
 
+
+// to collect data from the user profile
+router.post('/track-habit',usersController.trackHabit);
+
 // to signout the user
 router.get('/sign-out',usersController.destroySession);
 
