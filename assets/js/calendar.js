@@ -1,36 +1,25 @@
+
 $(document).ready(function () {
+  const calendarEventDate = $('#calendar').data('calendar-events'); 
+  console.log(calendarEventDate); 
   $('#calendar').fullCalendar({
     defaultView: 'month',
-    events: [],
-    eventColor: '#378006',
-  });
-});
-
-// Function to update calendar
-function updateCalendar() {
-  // Make an AJAX request to the server
-  $.ajax({
-    url: '/users/update-calendar',
-    method: 'GET',
-    success: function(data) {
-      const isStreak = data.data.isStreak;
-      console.log(isStreak);
-      if (isStreak) {
-        // Apply styling for streak to the current day
-        const today = new Date().toISOString().split('T')[0];
-        const calendarElement = $(`td[data-date="${today}"]`);
-        if (calendarElement.length > 0) {
-          calendarElement.css('background-color', '#378006');
+    dayRender: function (date, cell) {
+      var dateString = date.format('YYYY-MM-DD');
+      var eventExists = false;
+      // Check if an event exists for the current date
+      calendarEventDate.forEach(function (event) {
+        if (event.date === dateString) {
+          eventExists = true;
+          return false; // Exit the loop since we found a match
         }
+      });
+
+      // Apply CSS styling to the date cell if an event exists
+      if (eventExists) {
+        cell.css('background-color', '#378006'); // Set the background color to green
+        cell.css('color', '#fff'); // Set the text color to white
       }
-    },
-    error: function(xhr, status, error) {
-      console.error('Failed to check overall streak:', error);
     }
   });
-}
-
-// Call the function to check overall streak
-updateCalendar();
-
-
+});

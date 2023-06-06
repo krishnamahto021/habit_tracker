@@ -1,4 +1,6 @@
 const User = require('../models/users');
+const CalendarEvent = require('../models/calendar_events');
+const mongoose = require('mongoose');
 const userSignUpMailer = require('../mailers/user_sign_up_mailer');
 const forgottenPasswordMailer = require('../mailers/fogotten_password_mailer');
 const crypto = require('crypto');
@@ -125,43 +127,68 @@ module.exports.updatePassword = async function (req, res) {
 }
 
 // to collect data from the user profile page of the user
-module.exports.trackHabit =  function(req,res){
-    const user= res.locals.user;
+module.exports.trackHabit = async function (req, res) {
+    const user = res.locals.user;
     user.diet = req.body.diet;
     user.book = req.body.book;
     user.podcast = req.body.podcast;
     user.walk = req.body.walk;
-    user.skincare  = req.body.skincare;
-    user.save();
-    req.flash('success','Habit for today Tracked Successfully!');
-    return res.redirect('/users/calendar');
-}
+    user.skincare = req.body.skincare;
+    await user.save();
 
-// to show calendar 
-module.exports.showCalendar = function(req,res){
-    return res.render('calendar',{
-        title:'Streak'
-    })
+    const trackedHabits = ['diet', 'book', 'podcast', 'walk', 'skincare'];
+    let calendarEvent;
+    const trackedHabitCount = trackedHabits.reduce((count, habit) => {
+        if (user[habit] === 'done') {
+            count++;
+            const date = new Date().toISOString().split('T')[0];
+            // console.log(date);
+            calendarEvent = new CalendarEvent({
+                user: user.id,
+                habit: habit,
+                dates: [{ date: date }]
+            });
+            calendarEvent.save();
+        }
+        return count;
+    }, 0);
+
+    if (trackedHabitCount === trackedHabits.length) {
+        user.calendarEvent = (calendarEvent.id);
+        await user.save();
+    }
+
+    req.flash('success', 'Habit for today Tracked Successfully!');
+    return res.redirect('/users/calendar');
 };
 
-// to update the calendar
-module.exports.updateCalendar = function(req,res){
-    const user = res.locals.user;
-    if(user.diet === 'done' && user.walk === 'done' && user.podcast === 'done' && user.skincare === 'done' && user.book === 'done'){
-        const responseData = {
-            userId : req.user._id,
-            isStreak:true
-        }
-        return res.json(200,{
-            data:responseData,
-            message:'Updated Streak'
+
+// to show calendar 
+module.exports.showCalendar = async function (req, res) {
+    try {
+        const user = res.locals.user;
+        const calendarEvent = await CalendarEvent.findOne({ user: user._id });
+        const calendarEventDates = calendarEvent.dates.map(dateObj => {
+            return { date: dateObj.date.toISOString().split('T')[0] };
         });
-    }else{
-        return res.json(401,{
-            message:'Not Done!!'
-        })
+        // console.log(calendarEventDates);
+
+
+        return res.render('calendar', {// Render the 'calendar' view 
+            title: 'Calendar',
+            calendarEventDates:calendarEventDates
+        }
+        );
+    } catch (error) {
+        console.error('Error fetching calendar events:', error);
+        return res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
+
+
+
+
+
 
 
 

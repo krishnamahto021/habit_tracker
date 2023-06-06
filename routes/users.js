@@ -32,8 +32,8 @@ router.post('/track-habit',usersController.trackHabit);
 // to show calendar of the performance
 router.get('/calendar',usersController.showCalendar);
 
-// to update the calendar
-router.get('/update-calendar',usersController.updateCalendar);
+
+
 
 // to signout the user
 router.get('/sign-out',usersController.destroySession);
