@@ -136,27 +136,48 @@ module.exports.trackHabit = async function (req, res) {
     user.skincare = req.body.skincare;
     await user.save();
 
-    const trackedHabits = ['diet', 'book', 'podcast', 'walk', 'skincare'];
-    let calendarEvent;
-    const trackedHabitCount = trackedHabits.reduce((count, habit) => {
-        if (user[habit] === 'done') {
-            count++;
-            const date = new Date().toISOString().split('T')[0];
-            // console.log(date);
-            calendarEvent = new CalendarEvent({
-                user: user.id,
-                habit: habit,
+    if (user.diet === 'done' && user.book === 'done' && user.podcast === 'done' && user.walk === 'done' && user.skincare === 'done') {
+        const date = new Date().toISOString().split('T')[0];
+        if (user.calendarEvent) {
+            // console.log('alreday exists');
+            // console.log(user.calendarEvent._id);
+            const calendarEvent = await CalendarEvent.findOne({ user: user._id });
+            // console.log(calendarEvent.dates);
+            calendarEvent.dates.push({ date: date });
+            calendarEvent.save();
+        } else {
+            // console.log('new');
+            let newCalendarEvent = new CalendarEvent({
+                user: user._id,
+                // dates:[{date:date},{date:'2023-06-01'}]
                 dates: [{ date: date }]
             });
-            calendarEvent.save();
+            newCalendarEvent.save();
+            user.calendarEvent = newCalendarEvent.id;
+            await user.save();
         }
-        return count;
-    }, 0);
-
-    if (trackedHabitCount === trackedHabits.length) {
-        user.calendarEvent = (calendarEvent.id);
-        await user.save();
     }
+
+    // const trackedHabitCount = trackedHabits.reduce((count, habit) => {
+    //     if (user[habit] === 'done') {
+    //         count++;
+    //         const date = new Date().toISOString().split('T')[0];
+    //         // console.log(date);
+    //         calendarEvent = new CalendarEvent({
+    //             user: user.id,
+    //             habit: habit,
+    //             dates: [{ date: date },{date:'2023-06-01'}],
+    //         });
+    //         calendarEvent.save();
+    //         console.log(calendarEvent.dates);
+    //     }
+    //     return count;
+    // }, 0);
+
+    // if (trackedHabitCount === trackedHabits.length) {
+    //     user.calendarEvent = (calendarEvent.id);
+    //     await user.save();
+    // }
 
     req.flash('success', 'Habit for today Tracked Successfully!');
     return res.redirect('/users/calendar');
@@ -167,7 +188,9 @@ module.exports.trackHabit = async function (req, res) {
 module.exports.showCalendar = async function (req, res) {
     try {
         const user = res.locals.user;
-        const calendarEvent = await CalendarEvent.findOne({ user: user._id });
+        const calendarEventId = user.calendarEvent._id;
+        const calendarEvent = await CalendarEvent.findById(calendarEventId);
+        // console.log(calendarEvent);
         const calendarEventDates = calendarEvent.dates.map(dateObj => {
             return { date: dateObj.date.toISOString().split('T')[0] };
         });
@@ -176,7 +199,7 @@ module.exports.showCalendar = async function (req, res) {
 
         return res.render('calendar', {// Render the 'calendar' view 
             title: 'Calendar',
-            calendarEventDates:calendarEventDates
+            calendarEventDates: calendarEventDates
         }
         );
     } catch (error) {

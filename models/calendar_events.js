@@ -5,10 +5,6 @@ const calendarEventSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  habit: {
-    type: String,
-    required: true
-  },
   dates:[{
     date:{
     type: Date,
