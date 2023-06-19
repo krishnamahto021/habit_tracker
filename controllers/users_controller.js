@@ -188,6 +188,7 @@ module.exports.trackHabit = async function (req, res) {
 module.exports.showCalendar = async function (req, res) {
     try {
         const user = res.locals.user;
+        if(user){
         const calendarEventId = user.calendarEvent._id;
         const calendarEvent = await CalendarEvent.findById(calendarEventId);
         // console.log(calendarEvent);
@@ -202,6 +203,7 @@ module.exports.showCalendar = async function (req, res) {
             calendarEventDates: calendarEventDates
         }
         );
+    }
     } catch (error) {
         console.error('Error fetching calendar events:', error);
         return res.status(500).json({ error: 'Internal server error' });
